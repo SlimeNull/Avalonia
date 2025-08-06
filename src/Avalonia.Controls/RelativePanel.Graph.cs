@@ -8,30 +8,30 @@ namespace Avalonia.Controls
 {
     public partial class RelativePanel
     {
-        private class Graph
+        private sealed class Graph
         {
-            private double m_minX;
-            private double m_maxX;
-            private double m_minY;
-            private double m_maxY;
-            private bool m_isMinCapped;
-            private bool m_isMaxCapped;
-            private bool m_knownErrorPending;
-            private bool m_agErrorCode;
-            private Size m_availableSizeForNodeResolution;
+            private double _minX;
+            private double _maxX;
+            private double _minY;
+            private double _maxY;
+            private bool _isMinCapped;
+            private bool _isMaxCapped;
+            private bool _knownErrorPending;
+            private bool _agErrorCode;
+            private Size _availableSizeForNodeResolution;
 
-            public LinkedList<GraphNode> Nodes { get; }
+            public List<GraphNode> Nodes { get; }
 
             public Graph()
             {
-                m_minX = 0.0f;
-                m_maxX = 0.0f;
-                m_minY = 0.0f;
-                m_maxY = 0.0f;
-                m_isMinCapped = false;
-                m_isMaxCapped = false;
-                m_knownErrorPending = false;
-                m_agErrorCode = false;
+                _minX = 0.0f;
+                _maxX = 0.0f;
+                _minY = 0.0f;
+                _maxY = 0.0f;
+                _isMinCapped = false;
+                _isMaxCapped = false;
+                _knownErrorPending = false;
+                _agErrorCode = false;
 
                 Nodes = new();
             }
@@ -62,7 +62,8 @@ namespace Avalonia.Controls
             // sibling, that means that the space that is available to this element
             // in particular is now the available size minus the Width of the 
             // ArrangeRect associated with this sibling.
-            private void CalculateMeasureRectHorizontally(GraphNode node, Size availableSize, out double x, out double width)
+            private void CalculateMeasureRectHorizontally(GraphNode node, Size availableSize, out double x,
+                out double width)
             {
                 bool isHorizontallyCenteredFromLeft = false;
                 bool isHorizontallyCenteredFromRight = false;
@@ -100,8 +101,8 @@ namespace Avalonia.Controls
                     {
                         if (node.IsAlignLeftWith())
                         {
-                            GraphNode alignLeftWithNeighbor = node.m_alignLeftWithNode!;
-                            double restrictedHorizontalSpace = alignLeftWithNeighbor.m_arrangeRect.X;
+                            GraphNode alignLeftWithNeighbor = node._alignLeftWithNode!;
+                            double restrictedHorizontalSpace = alignLeftWithNeighbor._arrangeRect.X;
 
                             x = restrictedHorizontalSpace;
                             width -= restrictedHorizontalSpace;
@@ -112,8 +113,9 @@ namespace Avalonia.Controls
                         }
                         else if (node.IsRightOf())
                         {
-                            GraphNode rightOfNeighbor = node.m_rightOfNode!;
-                            double restrictedHorizontalSpace = rightOfNeighbor.m_arrangeRect.X + rightOfNeighbor.m_arrangeRect.Width;
+                            GraphNode rightOfNeighbor = node._rightOfNode!;
+                            double restrictedHorizontalSpace =
+                                rightOfNeighbor._arrangeRect.X + rightOfNeighbor._arrangeRect.Width;
 
                             x = restrictedHorizontalSpace;
                             width -= restrictedHorizontalSpace;
@@ -142,9 +144,10 @@ namespace Avalonia.Controls
                     {
                         if (node.IsAlignRightWith())
                         {
-                            GraphNode alignRightWithNeighbor = node.m_alignRightWithNode!;
+                            GraphNode alignRightWithNeighbor = node._alignRightWithNode!;
 
-                            width -= availableSize.Width - (alignRightWithNeighbor.m_arrangeRect.X + alignRightWithNeighbor.m_arrangeRect.Width);
+                            width -= availableSize.Width - (alignRightWithNeighbor._arrangeRect.X +
+                                                            alignRightWithNeighbor._arrangeRect.Width);
                         }
                         else if (node.IsAlignHorizontalCenterWith())
                         {
@@ -152,22 +155,25 @@ namespace Avalonia.Controls
                         }
                         else if (node.IsLeftOf())
                         {
-                            GraphNode leftOfNeighbor = node.m_leftOfNode!;
+                            GraphNode leftOfNeighbor = node._leftOfNode!;
 
-                            width -= availableSize.Width - leftOfNeighbor.m_arrangeRect.X;
+                            width -= availableSize.Width - leftOfNeighbor._arrangeRect.X;
                         }
                     }
 
                     if (isHorizontallyCenteredFromLeft && isHorizontallyCenteredFromRight)
                     {
-                        GraphNode alignHorizontalCenterWithNeighbor = node.m_alignHorizontalCenterWithNode!;
-                        double centerOfNeighbor = alignHorizontalCenterWithNeighbor.m_arrangeRect.X + (alignHorizontalCenterWithNeighbor.m_arrangeRect.Width / 2.0f);
+                        GraphNode alignHorizontalCenterWithNeighbor = node._alignHorizontalCenterWithNode!;
+                        double centerOfNeighbor = alignHorizontalCenterWithNeighbor._arrangeRect.X +
+                                                  (alignHorizontalCenterWithNeighbor._arrangeRect.Width / 2.0f);
                         width = Math.Min(centerOfNeighbor, availableSize.Width - centerOfNeighbor) * 2.0f;
                         x = centerOfNeighbor - (width / 2.0f);
                     }
                 }
             }
-            private void CalculateMeasureRectVertically(GraphNode node, Size availableSize, out double y, out double height)
+
+            private void CalculateMeasureRectVertically(GraphNode node, Size availableSize, out double y,
+                out double height)
             {
                 bool isVerticallyCenteredFromTop = false;
                 bool isVerticallyCenteredFromBottom = false;
@@ -221,8 +227,8 @@ namespace Avalonia.Controls
                     {
                         if (node.IsAlignTopWith())
                         {
-                            GraphNode alignTopWithNeighbor = node.m_alignTopWithNode!;
-                            double restrictedVerticalSpace = alignTopWithNeighbor.m_arrangeRect.Y;
+                            GraphNode alignTopWithNeighbor = node._alignTopWithNode!;
+                            double restrictedVerticalSpace = alignTopWithNeighbor._arrangeRect.Y;
 
                             y = restrictedVerticalSpace;
                             height -= restrictedVerticalSpace;
@@ -233,8 +239,9 @@ namespace Avalonia.Controls
                         }
                         else if (node.IsBelow())
                         {
-                            GraphNode belowNeighbor = node.m_belowNode!;
-                            double restrictedVerticalSpace = belowNeighbor.m_arrangeRect.Y + belowNeighbor.m_arrangeRect.Height;
+                            GraphNode belowNeighbor = node._belowNode!;
+                            double restrictedVerticalSpace =
+                                belowNeighbor._arrangeRect.Y + belowNeighbor._arrangeRect.Height;
 
                             y = restrictedVerticalSpace;
                             height -= restrictedVerticalSpace;
@@ -280,9 +287,10 @@ namespace Avalonia.Controls
                     {
                         if (node.IsAlignBottomWith())
                         {
-                            GraphNode alignBottomWithNeighbor = node.m_alignBottomWithNode!;
+                            GraphNode alignBottomWithNeighbor = node._alignBottomWithNode!;
 
-                            height -= availableSize.Height - (alignBottomWithNeighbor.m_arrangeRect.Y + alignBottomWithNeighbor.m_arrangeRect.Height);
+                            height -= availableSize.Height - (alignBottomWithNeighbor._arrangeRect.Y +
+                                                              alignBottomWithNeighbor._arrangeRect.Height);
                         }
                         else if (node.IsAlignVerticalCenterWith())
                         {
@@ -290,16 +298,17 @@ namespace Avalonia.Controls
                         }
                         else if (node.IsAbove())
                         {
-                            GraphNode aboveNeighbor = node.m_aboveNode!;
+                            GraphNode aboveNeighbor = node._aboveNode!;
 
-                            height -= availableSize.Height - aboveNeighbor.m_arrangeRect.Y;
+                            height -= availableSize.Height - aboveNeighbor._arrangeRect.Y;
                         }
                     }
 
                     if (isVerticallyCenteredFromTop && isVerticallyCenteredFromBottom)
                     {
-                        GraphNode alignVerticalCenterWithNeighbor = node.m_alignVerticalCenterWithNode!;
-                        double centerOfNeighbor = alignVerticalCenterWithNeighbor.m_arrangeRect.Y + (alignVerticalCenterWithNeighbor.m_arrangeRect.Height / 2.0f);
+                        GraphNode alignVerticalCenterWithNeighbor = node._alignVerticalCenterWithNode!;
+                        double centerOfNeighbor = alignVerticalCenterWithNeighbor._arrangeRect.Y +
+                                                  (alignVerticalCenterWithNeighbor._arrangeRect.Height / 2.0f);
                         height = Math.Min(centerOfNeighbor, availableSize.Height - centerOfNeighbor) * 2.0f;
                         y = centerOfNeighbor - (height / 2.0f);
                     }
@@ -317,7 +326,7 @@ namespace Avalonia.Controls
             // sides of the rect.
             private void CalculateArrangeRectHorizontally(GraphNode node, out double x, out double width)
             {
-                UnsafeRect measureRect = node.m_measureRect;
+                UnsafeRect measureRect = node._measureRect;
                 double desiredWidth = Math.Min(measureRect.Width, node.Element.DesiredSize.Width);
 
                 //Debug.Assert(node.IsMeasured() && (measureRect.Width != double.PositiveInfinity));
@@ -353,9 +362,10 @@ namespace Avalonia.Controls
                     width = desiredWidth;
                 }
             }
+
             private void CalculateArrangeRectVertically(GraphNode node, out double y, out double height)
             {
-                UnsafeRect measureRect = node.m_measureRect;
+                UnsafeRect measureRect = node._measureRect;
                 double desiredHeight = Math.Min(measureRect.Height, node.Element.DesiredSize.Height);
 
                 //Debug.Assert(node.IsMeasured() && (measureRect.Height != double.PositiveInfinity));
@@ -391,12 +401,13 @@ namespace Avalonia.Controls
                     height = desiredHeight;
                 }
             }
+
             private void MarkHorizontalAndVerticalLeaves()
             {
                 foreach (var node in Nodes)
                 {
-                    node.m_isHorizontalLeaf = true;
-                    node.m_isVerticalLeaf = true;
+                    node._isHorizontalLeaf = true;
+                    node._isVerticalLeaf = true;
                 }
 
                 foreach (var node in Nodes)
@@ -417,14 +428,14 @@ namespace Avalonia.Controls
                 // right by the desired width of the node with which we are 
                 // currently working and refresh the maximum positive value.
                 x += node.Element.DesiredSize.Width;
-                m_maxX = Math.Max(m_maxX, x);
+                _maxX = Math.Max(_maxX, x);
 
                 if (node.IsAlignLeftWithPanel())
                 {
-                    if (!m_isMaxCapped)
+                    if (!_isMaxCapped)
                     {
-                        m_maxX = x;
-                        m_isMaxCapped = true;
+                        _maxX = x;
+                        _isMaxCapped = true;
                     }
                 }
                 else if (node.IsAlignLeftWith())
@@ -432,9 +443,9 @@ namespace Avalonia.Controls
                     // If the AlignLeftWithNode and AlignRightWithNode are the
                     // same element, we can skip the former, since we will move 
                     // through the latter later.
-                    if (node.m_alignLeftWithNode != node.m_alignRightWithNode)
+                    if (node._alignLeftWithNode != node._alignRightWithNode)
                     {
-                        AccumulateNegativeDesiredWidth(node.m_alignLeftWithNode!, x);
+                        AccumulateNegativeDesiredWidth(node._alignLeftWithNode!, x);
                     }
                 }
                 else if (node.IsAlignHorizontalCenterWith())
@@ -443,19 +454,19 @@ namespace Avalonia.Controls
                 }
                 else if (node.IsRightOf())
                 {
-                    AccumulatePositiveDesiredWidth(node.m_rightOfNode!, x);
+                    AccumulatePositiveDesiredWidth(node._rightOfNode!, x);
                 }
 
                 if (node.IsAlignRightWithPanel())
                 {
-                    if (m_isMinCapped)
+                    if (_isMinCapped)
                     {
-                        m_minX = Math.Min(m_minX, initialX);
+                        _minX = Math.Min(_minX, initialX);
                     }
                     else
                     {
-                        m_minX = initialX;
-                        m_isMinCapped = true;
+                        _minX = initialX;
+                        _isMinCapped = true;
                     }
                 }
                 else if (node.IsAlignRightWith())
@@ -468,7 +479,7 @@ namespace Avalonia.Controls
                     // the positive direction, that means that we have already 
                     // moved the cursor right to calculate the maximum positive 
                     // value, so we will use the initial value of Y.
-                    AccumulatePositiveDesiredWidth(node.m_alignRightWithNode!, initialX);
+                    AccumulatePositiveDesiredWidth(node._alignRightWithNode!, initialX);
                 }
                 else if (node.IsAlignHorizontalCenterWith())
                 {
@@ -484,15 +495,15 @@ namespace Avalonia.Controls
                     // direction, that means that we have already moved the 
                     // cursor right to calculate the maximum positive value, so
                     // we will use the initial value of X.
-                    AccumulateNegativeDesiredWidth(node.m_leftOfNode!, initialX);
+                    AccumulateNegativeDesiredWidth(node._leftOfNode!, initialX);
                 }
 
                 if (isHorizontallyCenteredFromLeft && isHorizontallyCenteredFromRight)
                 {
                     double centerX = x - (node.Element.DesiredSize.Width / 2.0f);
-                    double edgeX = centerX - (node.m_alignHorizontalCenterWithNode!.Element.DesiredSize.Width / 2.0f);
-                    m_minX = Math.Min(m_minX, edgeX);
-                    AccumulatePositiveDesiredWidth(node.m_alignHorizontalCenterWithNode, edgeX);
+                    double edgeX = centerX - (node._alignHorizontalCenterWithNode!.Element.DesiredSize.Width / 2.0f);
+                    _minX = Math.Min(_minX, edgeX);
+                    AccumulatePositiveDesiredWidth(node._alignHorizontalCenterWithNode, edgeX);
                 }
                 else if (node.IsHorizontalCenterAnchored)
                 {
@@ -507,12 +518,13 @@ namespace Avalonia.Controls
                     // either the difference from center to left or the difference
                     // from center to right, whichever is the greatest.
                     double centerX = x - (node.Element.DesiredSize.Width / 2.0f);
-                    double upper = m_maxX - centerX;
-                    double lower = centerX - m_minX;
-                    m_maxX = Math.Max(upper, lower) * 2.0f;
-                    m_minX = 0.0f;
+                    double upper = _maxX - centerX;
+                    double lower = centerX - _minX;
+                    _maxX = Math.Max(upper, lower) * 2.0f;
+                    _minX = 0.0f;
                 }
             }
+
             private void AccumulateNegativeDesiredWidth(GraphNode node, double x)
             {
                 double initialX = x;
@@ -525,14 +537,14 @@ namespace Avalonia.Controls
                 // left by the desired width of the node with which we are 
                 // currently working and refresh the minimum negative value.
                 x -= node.Element.DesiredSize.Width;
-                m_minX = Math.Min(m_minX, x);
+                _minX = Math.Min(_minX, x);
 
                 if (node.IsAlignRightWithPanel())
                 {
-                    if (!m_isMinCapped)
+                    if (!_isMinCapped)
                     {
-                        m_minX = x;
-                        m_isMinCapped = true;
+                        _minX = x;
+                        _isMinCapped = true;
                     }
                 }
                 else if (node.IsAlignRightWith())
@@ -540,9 +552,9 @@ namespace Avalonia.Controls
                     // If the AlignRightWithNode and AlignLeftWithNode are the
                     // same element, we can skip the former, since we will move 
                     // through the latter later.
-                    if (node.m_alignRightWithNode != node.m_alignLeftWithNode)
+                    if (node._alignRightWithNode != node._alignLeftWithNode)
                     {
-                        AccumulatePositiveDesiredWidth(node.m_alignRightWithNode!, x);
+                        AccumulatePositiveDesiredWidth(node._alignRightWithNode!, x);
                     }
                 }
                 else if (node.IsAlignHorizontalCenterWith())
@@ -551,19 +563,19 @@ namespace Avalonia.Controls
                 }
                 else if (node.IsLeftOf())
                 {
-                    AccumulateNegativeDesiredWidth(node.m_leftOfNode!, x);
+                    AccumulateNegativeDesiredWidth(node._leftOfNode!, x);
                 }
 
                 if (node.IsAlignLeftWithPanel())
                 {
-                    if (m_isMaxCapped)
+                    if (_isMaxCapped)
                     {
-                        m_maxX = Math.Max(m_maxX, initialX);
+                        _maxX = Math.Max(_maxX, initialX);
                     }
                     else
                     {
-                        m_maxX = initialX;
-                        m_isMaxCapped = true;
+                        _maxX = initialX;
+                        _isMaxCapped = true;
                     }
                 }
                 else if (node.IsAlignLeftWith())
@@ -576,7 +588,7 @@ namespace Avalonia.Controls
                     // direction, that means that we have already moved the 
                     // cursor left to calculate the minimum negative value,
                     // so we will use the initial value of X.
-                    AccumulateNegativeDesiredWidth(node.m_alignLeftWithNode!, initialX);
+                    AccumulateNegativeDesiredWidth(node._alignLeftWithNode!, initialX);
                 }
                 else if (node.IsAlignHorizontalCenterWith())
                 {
@@ -592,15 +604,15 @@ namespace Avalonia.Controls
                     // direction, that means that we have already moved the 
                     // cursor left to calculate the minimum negative value, so
                     // we will use the initial value of X.
-                    AccumulatePositiveDesiredWidth(node.m_rightOfNode!, initialX);
+                    AccumulatePositiveDesiredWidth(node._rightOfNode!, initialX);
                 }
 
                 if (isHorizontallyCenteredFromLeft && isHorizontallyCenteredFromRight)
                 {
                     double centerX = x + (node.Element.DesiredSize.Width / 2.0f);
-                    double edgeX = centerX + (node.m_alignHorizontalCenterWithNode!.Element.DesiredSize.Width / 2.0f);
-                    m_maxX = Math.Max(m_maxX, edgeX);
-                    AccumulateNegativeDesiredWidth(node.m_alignHorizontalCenterWithNode, edgeX);
+                    double edgeX = centerX + (node._alignHorizontalCenterWithNode!.Element.DesiredSize.Width / 2.0f);
+                    _maxX = Math.Max(_maxX, edgeX);
+                    AccumulateNegativeDesiredWidth(node._alignHorizontalCenterWithNode, edgeX);
                 }
                 else if (node.IsHorizontalCenterAnchored)
                 {
@@ -615,12 +627,13 @@ namespace Avalonia.Controls
                     // either the difference from center to left or the difference
                     // from center to right, whichever is the greatest.
                     double centerX = x + (node.Element.DesiredSize.Width / 2.0f);
-                    double upper = m_maxX - centerX;
-                    double lower = centerX - m_minX;
-                    m_maxX = Math.Max(upper, lower) * 2.0f;
-                    m_minX = 0.0f;
+                    double upper = _maxX - centerX;
+                    double lower = centerX - _minX;
+                    _maxX = Math.Max(upper, lower) * 2.0f;
+                    _minX = 0.0f;
                 }
             }
+
             private void AccumulatePositiveDesiredHeight(GraphNode node, double y)
             {
                 double initialY = y;
@@ -633,14 +646,14 @@ namespace Avalonia.Controls
                 // up by the desired height of the node with which we are 
                 // currently working and refresh the maximum positive value.
                 y += node.Element.DesiredSize.Height;
-                m_maxY = Math.Max(m_maxY, y);
+                _maxY = Math.Max(_maxY, y);
 
                 if (node.IsAlignTopWithPanel())
                 {
-                    if (!m_isMaxCapped)
+                    if (!_isMaxCapped)
                     {
-                        m_maxY = y;
-                        m_isMaxCapped = true;
+                        _maxY = y;
+                        _isMaxCapped = true;
                     }
                 }
                 else if (node.IsAlignTopWith())
@@ -648,9 +661,9 @@ namespace Avalonia.Controls
                     // If the AlignTopWithNode and AlignBottomWithNode are the
                     // same element, we can skip the former, since we will move 
                     // through the latter later.
-                    if (node.m_alignTopWithNode != node.m_alignBottomWithNode)
+                    if (node._alignTopWithNode != node._alignBottomWithNode)
                     {
-                        AccumulateNegativeDesiredHeight(node.m_alignTopWithNode!, y);
+                        AccumulateNegativeDesiredHeight(node._alignTopWithNode!, y);
                     }
                 }
                 else if (node.IsAlignVerticalCenterWith())
@@ -659,19 +672,19 @@ namespace Avalonia.Controls
                 }
                 else if (node.IsBelow())
                 {
-                    AccumulatePositiveDesiredHeight(node.m_belowNode!, y);
+                    AccumulatePositiveDesiredHeight(node._belowNode!, y);
                 }
 
                 if (node.IsAlignBottomWithPanel())
                 {
-                    if (m_isMinCapped)
+                    if (_isMinCapped)
                     {
-                        m_minY = Math.Min(m_minY, initialY);
+                        _minY = Math.Min(_minY, initialY);
                     }
                     else
                     {
-                        m_minY = initialY;
-                        m_isMinCapped = true;
+                        _minY = initialY;
+                        _isMinCapped = true;
                     }
                 }
                 else if (node.IsAlignBottomWith())
@@ -684,7 +697,7 @@ namespace Avalonia.Controls
                     // the positive direction, that means that we have already 
                     // moved the cursor up to calculate the maximum positive 
                     // value, so we will use the initial value of Y.
-                    AccumulatePositiveDesiredHeight(node.m_alignBottomWithNode!, initialY);
+                    AccumulatePositiveDesiredHeight(node._alignBottomWithNode!, initialY);
                 }
                 else if (node.IsAlignVerticalCenterWith())
                 {
@@ -700,15 +713,15 @@ namespace Avalonia.Controls
                     // means that we have already moved the cursor up to 
                     // calculate the maximum positive value, so we will use
                     // the initial value of Y.
-                    AccumulateNegativeDesiredHeight(node.m_aboveNode!, initialY);
+                    AccumulateNegativeDesiredHeight(node._aboveNode!, initialY);
                 }
 
                 if (isVerticallyCenteredFromTop && isVerticallyCenteredFromBottom)
                 {
                     double centerY = y - (node.Element.DesiredSize.Height / 2.0f);
-                    double edgeY = centerY - (node.m_alignVerticalCenterWithNode!.Element.DesiredSize.Height / 2.0f);
-                    m_minY = Math.Min(m_minY, edgeY);
-                    AccumulatePositiveDesiredHeight(node.m_alignVerticalCenterWithNode, edgeY);
+                    double edgeY = centerY - (node._alignVerticalCenterWithNode!.Element.DesiredSize.Height / 2.0f);
+                    _minY = Math.Min(_minY, edgeY);
+                    AccumulatePositiveDesiredHeight(node._alignVerticalCenterWithNode, edgeY);
                 }
                 else if (node.IsVerticalCenterAnchored)
                 {
@@ -723,12 +736,13 @@ namespace Avalonia.Controls
                     // either the difference from center to top or the difference
                     // from center to bottom, whichever is the greatest.
                     double centerY = y - (node.Element.DesiredSize.Height / 2.0f);
-                    double upper = m_maxY - centerY;
-                    double lower = centerY - m_minY;
-                    m_maxY = Math.Max(upper, lower) * 2.0f;
-                    m_minY = 0.0f;
+                    double upper = _maxY - centerY;
+                    double lower = centerY - _minY;
+                    _maxY = Math.Max(upper, lower) * 2.0f;
+                    _minY = 0.0f;
                 }
             }
+
             private void AccumulateNegativeDesiredHeight(GraphNode node, double y)
             {
                 double initialY = y;
@@ -741,14 +755,14 @@ namespace Avalonia.Controls
                 // down by the desired height of the node with which we are 
                 // currently working and refresh the minimum negative value.
                 y -= node.Element.DesiredSize.Height;
-                m_minY = Math.Min(m_minY, y);
+                _minY = Math.Min(_minY, y);
 
                 if (node.IsAlignBottomWithPanel())
                 {
-                    if (!m_isMinCapped)
+                    if (!_isMinCapped)
                     {
-                        m_minY = y;
-                        m_isMinCapped = true;
+                        _minY = y;
+                        _isMinCapped = true;
                     }
                 }
                 else if (node.IsAlignBottomWith())
@@ -756,9 +770,9 @@ namespace Avalonia.Controls
                     // If the AlignBottomWithNode and AlignTopWithNode are the
                     // same element, we can skip the former, since we will move 
                     // through the latter later.
-                    if (node.m_alignBottomWithNode != node.m_alignTopWithNode)
+                    if (node._alignBottomWithNode != node._alignTopWithNode)
                     {
-                        AccumulatePositiveDesiredHeight(node.m_alignBottomWithNode!, y);
+                        AccumulatePositiveDesiredHeight(node._alignBottomWithNode!, y);
                     }
                 }
                 else if (node.IsAlignVerticalCenterWith())
@@ -767,19 +781,19 @@ namespace Avalonia.Controls
                 }
                 else if (node.IsAbove())
                 {
-                    AccumulateNegativeDesiredHeight(node.m_aboveNode!, y);
+                    AccumulateNegativeDesiredHeight(node._aboveNode!, y);
                 }
 
                 if (node.IsAlignTopWithPanel())
                 {
-                    if (m_isMaxCapped)
+                    if (_isMaxCapped)
                     {
-                        m_maxY = Math.Max(m_maxY, initialY);
+                        _maxY = Math.Max(_maxY, initialY);
                     }
                     else
                     {
-                        m_maxY = initialY;
-                        m_isMaxCapped = true;
+                        _maxY = initialY;
+                        _isMaxCapped = true;
                     }
                 }
                 else if (node.IsAlignTopWith())
@@ -792,7 +806,7 @@ namespace Avalonia.Controls
                     // direction, that means that we have already moved the 
                     // cursor down to calculate the minimum negative value,
                     // so we will use the initial value of Y.
-                    AccumulateNegativeDesiredHeight(node.m_alignTopWithNode!, initialY);
+                    AccumulateNegativeDesiredHeight(node._alignTopWithNode!, initialY);
                 }
                 else if (node.IsAlignVerticalCenterWith())
                 {
@@ -808,15 +822,15 @@ namespace Avalonia.Controls
                     // means that we have already moved the cursor down to
                     // calculate the minimum negative value, so we will use
                     // the initial value of Y.
-                    AccumulatePositiveDesiredHeight(node.m_belowNode!, initialY);
+                    AccumulatePositiveDesiredHeight(node._belowNode!, initialY);
                 }
 
                 if (isVerticallyCenteredFromTop && isVerticallyCenteredFromBottom)
                 {
                     double centerY = y + (node.Element.DesiredSize.Height / 2.0f);
-                    double edgeY = centerY + (node.m_alignVerticalCenterWithNode!.Element.DesiredSize.Height / 2.0f);
-                    m_maxY = Math.Max(m_maxY, edgeY);
-                    AccumulateNegativeDesiredHeight(node.m_alignVerticalCenterWithNode, edgeY);
+                    double edgeY = centerY + (node._alignVerticalCenterWithNode!.Element.DesiredSize.Height / 2.0f);
+                    _maxY = Math.Max(_maxY, edgeY);
+                    AccumulateNegativeDesiredHeight(node._alignVerticalCenterWithNode, edgeY);
                 }
                 else if (node.IsVerticalCenterAnchored)
                 {
@@ -831,10 +845,10 @@ namespace Avalonia.Controls
                     // either the difference from center to top or the difference
                     // from center to bottom, whichever is the greatest.
                     double centerY = y + (node.Element.DesiredSize.Height / 2.0f);
-                    double upper = m_maxY - centerY;
-                    double lower = centerY - m_minY;
-                    m_maxY = Math.Max(upper, lower) * 2.0f;
-                    m_minY = 0.0f;
+                    double upper = _maxY - centerY;
+                    double lower = centerY - _minY;
+                    _maxY = Math.Max(upper, lower) * 2.0f;
+                    _minY = 0.0f;
                 }
             }
 
@@ -859,7 +873,7 @@ namespace Avalonia.Controls
                     // middle of circular dependency and we must throw an 
                     // InvalidOperationException. We will fail fast here and let
                     // the CRelativePanel handle the rest.
-                    m_knownErrorPending = true;
+                    _knownErrorPending = true;
                     //m_agErrorCode = AG_E_RELATIVEPANEL_CIRCULAR_DEP;
                     //E_FAIL;
 
@@ -873,24 +887,28 @@ namespace Avalonia.Controls
                     // In the meantime, we will mark the state as pending.
                     node.SetPending(true);
 
-                    MeasureNode(node.m_leftOfNode, availableSize);
-                    MeasureNode(node.m_aboveNode, availableSize);
-                    MeasureNode(node.m_rightOfNode, availableSize);
-                    MeasureNode(node.m_belowNode, availableSize);
-                    MeasureNode(node.m_alignLeftWithNode, availableSize);
-                    MeasureNode(node.m_alignTopWithNode, availableSize);
-                    MeasureNode(node.m_alignRightWithNode, availableSize);
-                    MeasureNode(node.m_alignBottomWithNode, availableSize);
-                    MeasureNode(node.m_alignHorizontalCenterWithNode, availableSize);
-                    MeasureNode(node.m_alignVerticalCenterWithNode, availableSize);
+                    MeasureNode(node._leftOfNode, availableSize);
+                    MeasureNode(node._aboveNode, availableSize);
+                    MeasureNode(node._rightOfNode, availableSize);
+                    MeasureNode(node._belowNode, availableSize);
+                    MeasureNode(node._alignLeftWithNode, availableSize);
+                    MeasureNode(node._alignTopWithNode, availableSize);
+                    MeasureNode(node._alignRightWithNode, availableSize);
+                    MeasureNode(node._alignBottomWithNode, availableSize);
+                    MeasureNode(node._alignHorizontalCenterWithNode, availableSize);
+                    MeasureNode(node._alignVerticalCenterWithNode, availableSize);
 
                     node.SetPending(false);
 
-                    CalculateMeasureRectHorizontally(node, availableSize, out node.m_measureRect.X, out node.m_measureRect.Width);
-                    CalculateMeasureRectVertically(node, availableSize, out node.m_measureRect.Y, out node.m_measureRect.Height);
+                    CalculateMeasureRectHorizontally(node, availableSize, out node._measureRect.X,
+                        out node._measureRect.Width);
+                    CalculateMeasureRectVertically(node, availableSize, out node._measureRect.Y,
+                        out node._measureRect.Height);
 
-                    constrainedAvailableSize = constrainedAvailableSize.WithWidth(Math.Max(node.m_measureRect.Width, 0.0f));
-                    constrainedAvailableSize = constrainedAvailableSize.WithHeight(Math.Max(node.m_measureRect.Height, 0.0f));
+                    constrainedAvailableSize = new Size(
+                        Math.Max(node._measureRect.Width, 0.0f),
+                        Math.Max(node._measureRect.Height, 0.0f));
+
                     node.Element.Measure(constrainedAvailableSize);
                     node.SetMeasured(true);
 
@@ -901,13 +919,13 @@ namespace Avalonia.Controls
                     // calculations until then.
                     if (availableSize.Width != double.PositiveInfinity)
                     {
-                        CalculateArrangeRectHorizontally(node, out node.m_arrangeRect.X, out node.m_arrangeRect.Width);
+                        CalculateArrangeRectHorizontally(node, out node._arrangeRect.X, out node._arrangeRect.Width);
                         node.SetArrangedHorizontally(true);
                     }
 
                     if (availableSize.Height != double.PositiveInfinity)
                     {
-                        CalculateArrangeRectVertically(node, out node.m_arrangeRect.Y, out node.m_arrangeRect.Height);
+                        CalculateArrangeRectVertically(node, out node._arrangeRect.Y, out node._arrangeRect.Height);
                         node.SetArrangedVertically(true);
                     }
                 }
@@ -929,19 +947,20 @@ namespace Avalonia.Controls
                 if (!node.IsArrangedHorizontally())
                 {
                     // We must resolve dependencies first.
-                    ArrangeNodeHorizontally(node.m_leftOfNode, finalSize);
-                    ArrangeNodeHorizontally(node.m_aboveNode, finalSize);
-                    ArrangeNodeHorizontally(node.m_rightOfNode, finalSize);
-                    ArrangeNodeHorizontally(node.m_belowNode, finalSize);
-                    ArrangeNodeHorizontally(node.m_alignLeftWithNode, finalSize);
-                    ArrangeNodeHorizontally(node.m_alignTopWithNode, finalSize);
-                    ArrangeNodeHorizontally(node.m_alignRightWithNode, finalSize);
-                    ArrangeNodeHorizontally(node.m_alignBottomWithNode, finalSize);
-                    ArrangeNodeHorizontally(node.m_alignHorizontalCenterWithNode, finalSize);
-                    ArrangeNodeHorizontally(node.m_alignVerticalCenterWithNode, finalSize);
+                    ArrangeNodeHorizontally(node._leftOfNode, finalSize);
+                    ArrangeNodeHorizontally(node._aboveNode, finalSize);
+                    ArrangeNodeHorizontally(node._rightOfNode, finalSize);
+                    ArrangeNodeHorizontally(node._belowNode, finalSize);
+                    ArrangeNodeHorizontally(node._alignLeftWithNode, finalSize);
+                    ArrangeNodeHorizontally(node._alignTopWithNode, finalSize);
+                    ArrangeNodeHorizontally(node._alignRightWithNode, finalSize);
+                    ArrangeNodeHorizontally(node._alignBottomWithNode, finalSize);
+                    ArrangeNodeHorizontally(node._alignHorizontalCenterWithNode, finalSize);
+                    ArrangeNodeHorizontally(node._alignVerticalCenterWithNode, finalSize);
 
-                    CalculateMeasureRectHorizontally(node, finalSize, out node.m_measureRect.X, out node.m_measureRect.Width);
-                    CalculateArrangeRectHorizontally(node, out node.m_arrangeRect.X, out node.m_arrangeRect.Width);
+                    CalculateMeasureRectHorizontally(node, finalSize, out node._measureRect.X,
+                        out node._measureRect.Width);
+                    CalculateArrangeRectHorizontally(node, out node._arrangeRect.X, out node._arrangeRect.Width);
 
                     node.SetArrangedHorizontally(true);
                 }
@@ -963,19 +982,20 @@ namespace Avalonia.Controls
                 if (!node.IsArrangedVertically())
                 {
                     // We must resolve dependencies first.
-                    ArrangeNodeVertically(node.m_leftOfNode, finalSize);
-                    ArrangeNodeVertically(node.m_aboveNode, finalSize);
-                    ArrangeNodeVertically(node.m_rightOfNode, finalSize);
-                    ArrangeNodeVertically(node.m_belowNode, finalSize);
-                    ArrangeNodeVertically(node.m_alignLeftWithNode, finalSize);
-                    ArrangeNodeVertically(node.m_alignTopWithNode, finalSize);
-                    ArrangeNodeVertically(node.m_alignRightWithNode, finalSize);
-                    ArrangeNodeVertically(node.m_alignBottomWithNode, finalSize);
-                    ArrangeNodeVertically(node.m_alignHorizontalCenterWithNode, finalSize);
-                    ArrangeNodeVertically(node.m_alignVerticalCenterWithNode, finalSize);
+                    ArrangeNodeVertically(node._leftOfNode, finalSize);
+                    ArrangeNodeVertically(node._aboveNode, finalSize);
+                    ArrangeNodeVertically(node._rightOfNode, finalSize);
+                    ArrangeNodeVertically(node._belowNode, finalSize);
+                    ArrangeNodeVertically(node._alignLeftWithNode, finalSize);
+                    ArrangeNodeVertically(node._alignTopWithNode, finalSize);
+                    ArrangeNodeVertically(node._alignRightWithNode, finalSize);
+                    ArrangeNodeVertically(node._alignBottomWithNode, finalSize);
+                    ArrangeNodeVertically(node._alignHorizontalCenterWithNode, finalSize);
+                    ArrangeNodeVertically(node._alignVerticalCenterWithNode, finalSize);
 
-                    CalculateMeasureRectVertically(node, finalSize, out node.m_measureRect.Y, out node.m_measureRect.Height);
-                    CalculateArrangeRectVertically(node, out node.m_arrangeRect.Y, out node.m_arrangeRect.Height);
+                    CalculateMeasureRectVertically(node, finalSize, out node._measureRect.Y,
+                        out node._measureRect.Height);
+                    CalculateArrangeRectVertically(node, out node._arrangeRect.Y, out node._arrangeRect.Height);
 
                     node.SetArrangedVertically(true);
                 }
@@ -1066,7 +1086,7 @@ namespace Avalonia.Controls
                     MeasureNode(node, availableSize);
                 }
 
-                m_availableSizeForNodeResolution = availableSize;
+                _availableSizeForNodeResolution = availableSize;
             }
 
             public void ArrangeNodes(Rect finalRect)
@@ -1084,7 +1104,7 @@ namespace Avalonia.Controls
                 // size corresponds to the desired size of the panel), we must first
                 // recalculate the horizontal and/or vertical values of the ArrangeRects,
                 // respectively.
-                if (m_availableSizeForNodeResolution.Width != finalSize.Width)
+                if (_availableSizeForNodeResolution.Width != finalSize.Width)
                 {
                     foreach (GraphNode node in Nodes)
                     {
@@ -1097,7 +1117,7 @@ namespace Avalonia.Controls
                     }
                 }
 
-                if (m_availableSizeForNodeResolution.Height != finalSize.Height)
+                if (_availableSizeForNodeResolution.Height != finalSize.Height)
                 {
                     foreach (GraphNode node in Nodes)
                     {
@@ -1110,21 +1130,20 @@ namespace Avalonia.Controls
                     }
                 }
 
-                m_availableSizeForNodeResolution = finalSize;
+                _availableSizeForNodeResolution = finalSize;
 
                 foreach (GraphNode node in Nodes)
                 {
                     Debug.Assert(node.IsArranged());
 
                     Rect layoutSlot = new Rect(
-                        Math.Max(node.m_arrangeRect.X + finalRect.X, 0.0f),
-                        Math.Max(node.m_arrangeRect.Y + finalRect.Y, 0.0f),
-                        Math.Max(node.m_arrangeRect.Width, 0.0f),
-                        Math.Max(node.m_arrangeRect.Height, 0.0f));
+                        Math.Max(node._arrangeRect.X + finalRect.X, 0.0f),
+                        Math.Max(node._arrangeRect.Y + finalRect.Y, 0.0f),
+                        Math.Max(node._arrangeRect.Width, 0.0f),
+                        Math.Max(node._arrangeRect.Height, 0.0f));
 
                     node.Element.Arrange(layoutSlot);
                 }
-
             }
 
             public Size CalculateDesiredSize()
@@ -1135,26 +1154,30 @@ namespace Avalonia.Controls
 
                 foreach (var node in Nodes)
                 {
-                    if (node.m_isHorizontalLeaf)
+                    if (node._isHorizontalLeaf)
                     {
-                        m_minX = 0.0f;
-                        m_maxX = 0.0f;
-                        m_isMinCapped = false;
-                        m_isMaxCapped = false;
+                        _minX = 0.0f;
+                        _maxX = 0.0f;
+                        _isMinCapped = false;
+                        _isMaxCapped = false;
 
                         AccumulatePositiveDesiredWidth(node, 0.0f);
-                        maxDesiredSize = maxDesiredSize.WithWidth(Math.Max(maxDesiredSize.Width, m_maxX - m_minX));
+                        maxDesiredSize = new Size(
+                            Math.Max(maxDesiredSize.Width, _maxX - _minX),
+                            maxDesiredSize.Height);
                     }
 
-                    if (node.m_isVerticalLeaf)
+                    if (node._isVerticalLeaf)
                     {
-                        m_minY = 0.0f;
-                        m_maxY = 0.0f;
-                        m_isMinCapped = false;
-                        m_isMaxCapped = false;
+                        _minY = 0.0f;
+                        _maxY = 0.0f;
+                        _isMinCapped = false;
+                        _isMaxCapped = false;
 
                         AccumulatePositiveDesiredHeight(node, 0.0f);
-                        maxDesiredSize = maxDesiredSize.WithHeight(Math.Max(maxDesiredSize.Height, m_maxY - m_minY));
+                        maxDesiredSize = new Size(
+                            maxDesiredSize.Width,
+                            Math.Max(maxDesiredSize.Height, _maxY - _minY));
                     }
                 }
 

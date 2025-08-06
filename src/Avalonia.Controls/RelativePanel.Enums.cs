@@ -1,9 +1,12 @@
 ﻿// Ported from https://github.com/OrgEleCho/EleCho.WpfSuite/blob/master/EleCho.WpfSuite/Panels/RelativePanel.cs
 
+using System;
+
 namespace Avalonia.Controls
 {
     public partial class RelativePanel
     {
+        [Flags]
         enum Constraints
         {
             None = 0x00000,
@@ -25,6 +28,7 @@ namespace Avalonia.Controls
             AlignVerticalCenterWithPanel = 0x08000
         }
 
+        [Flags]
         enum State
         {
             Unresolved = 0x00,

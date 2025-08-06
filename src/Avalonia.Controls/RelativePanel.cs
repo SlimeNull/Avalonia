@@ -41,7 +41,7 @@ namespace Avalonia.Controls
 
             foreach (Control child in Children)
             {
-                _graph.Nodes.AddLast(new GraphNode(child));
+                _graph.Nodes.Add(new GraphNode(child));
             }
 
             _graph.ResolveConstraints();

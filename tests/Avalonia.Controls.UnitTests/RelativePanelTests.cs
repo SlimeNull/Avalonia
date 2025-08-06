@@ -17,13 +17,10 @@ namespace Avalonia.Controls.UnitTests
             {
                 VerticalAlignment = Layout.VerticalAlignment.Top,
                 HorizontalAlignment = Layout.HorizontalAlignment.Left,
-                Children =
-                {
-                    rect1, rect2
-                }
+                Children = { rect1, rect2 }
             };
 
-            RelativePanel.SetAlignLeftWithPanel(rect1 , true);
+            RelativePanel.SetAlignLeftWithPanel(rect1, true);
             RelativePanel.SetRightOf(rect2, rect1);
             target.Measure(new Size(400, 400));
             target.Arrange(new Rect(target.DesiredSize));
@@ -44,10 +41,7 @@ namespace Avalonia.Controls.UnitTests
             {
                 VerticalAlignment = Layout.VerticalAlignment.Top,
                 HorizontalAlignment = Layout.HorizontalAlignment.Left,
-                Children =
-                {
-                    rect1, rect2
-                }
+                Children = { rect1, rect2 }
             };
 
             RelativePanel.SetAlignLeftWithPanel(rect1, true);
@@ -71,10 +65,7 @@ namespace Avalonia.Controls.UnitTests
             {
                 VerticalAlignment = Layout.VerticalAlignment.Center,
                 HorizontalAlignment = Layout.HorizontalAlignment.Center,
-                Children =
-                {
-                    rect1, rect2
-                }
+                Children = { rect1, rect2 }
             };
 
             RelativePanel.SetAlignLeftWithPanel(rect1, true);
@@ -98,19 +89,17 @@ namespace Avalonia.Controls.UnitTests
             {
                 VerticalAlignment = Layout.VerticalAlignment.Center,
                 HorizontalAlignment = Layout.HorizontalAlignment.Center,
-                Children =
-                {
-                    rect1, rect2
-                }
+                Children = { rect1, rect2 }
             };
 
+            RelativePanel.SetAlignRightWithPanel(rect1, true);
             RelativePanel.SetLeftOf(rect2, rect1);
             target.Measure(new Size(400, 400));
             target.Arrange(new Rect(target.DesiredSize));
 
-            Assert.Equal(new Size(20, 20), target.Bounds.Size);
-            Assert.Equal(new Rect(0, 0, 20, 20), target.Children[0].Bounds);
-            Assert.Equal(new Rect(-20, 0, 20, 20), target.Children[1].Bounds);
+            Assert.Equal(new Size(40, 20), target.Bounds.Size);
+            Assert.Equal(new Rect(20, 0, 20, 20), target.Children[0].Bounds);
+            Assert.Equal(new Rect(0, 0, 20, 20), target.Children[1].Bounds);
         }
 
         [Fact]
@@ -124,19 +113,17 @@ namespace Avalonia.Controls.UnitTests
             {
                 VerticalAlignment = Layout.VerticalAlignment.Center,
                 HorizontalAlignment = Layout.HorizontalAlignment.Center,
-                Children =
-                {
-                    rect1, rect2
-                }
+                Children = { rect1, rect2 }
             };
 
+            RelativePanel.SetAlignBottomWithPanel(rect1, true);
             RelativePanel.SetAbove(rect2, rect1);
             target.Measure(new Size(400, 400));
             target.Arrange(new Rect(target.DesiredSize));
 
-            Assert.Equal(new Size(20, 20), target.Bounds.Size);
-            Assert.Equal(new Rect(0, 0, 20, 20), target.Children[0].Bounds);
-            Assert.Equal(new Rect(0, -20, 20, 20), target.Children[1].Bounds);
+            Assert.Equal(new Size(20, 40), target.Bounds.Size);
+            Assert.Equal(new Rect(0, 20, 20, 20), target.Children[0].Bounds);
+            Assert.Equal(new Rect(0, 0, 20, 20), target.Children[1].Bounds);
         }
 
         [Fact]
@@ -147,13 +134,7 @@ namespace Avalonia.Controls.UnitTests
             var rect2 = new Rectangle { Height = 20, Width = 20 };
             var rect3 = new Rectangle { Height = 20, Width = 20 };
 
-            var target = new RelativePanel
-            {
-                Children =
-                {
-                    rect1, rect2, rect3
-                }
-            };
+            var target = new RelativePanel { Children = { rect1, rect2, rect3 } };
 
             RelativePanel.SetAlignHorizontalCenterWithPanel(rect1, true);
             RelativePanel.SetRightOf(rect2, rect1);
@@ -203,7 +184,7 @@ namespace Avalonia.Controls.UnitTests
             RelativePanel.SetAlignLeftWithPanel(rectBottom, true);
             RelativePanel.SetAlignBottomWithPanel(rectBottom, true);
             RelativePanel.SetAlignRightWithPanel(rectBottom, true);
-            
+
             target.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             target.Arrange(new Rect(0, 0, target.DesiredSize.Width, target.DesiredSize.Height));
 
